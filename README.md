@@ -72,6 +72,13 @@ export default ({ env }) => ({
 
 ---
 
+## 🐛 Submitting Issues & Feedback
+
+If you encounter any bugs, have questions, or want to suggest new features, please submit an issue on our GitHub repository:
+👉 [Submit an Issue](https://github.com/Kaushik-Patil-biradar/-recyclebin-/issues)
+
+---
+
 ## 📄 License
 
 MIT © [Kaushik Patil](mailto:kaushik.patil@gigasolv.com)
