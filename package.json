@@ -2,6 +2,7 @@
   "name": "strapi-plugin-recycle-bin",
   "version": "1.0.5",
   "description": "Safely intercept content deletions in Strapi 5 with a soft-delete recycle bin",
+  "_comment": "v1.0.5: Updated with multi-select bulk restore/purge, interactive top-center confirmation alerts via react-toastify, and smooth UI enhancements",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Kaushik-Patil-biradar/-recyclebin-.git"
