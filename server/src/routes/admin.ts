@@ -9,6 +9,18 @@ export default {
     },
     {
       method: 'POST',
+      path: '/items/bulk-restore',
+      handler: 'recycleBin.bulkRestore',
+      config: { policies: ['admin::isAuthenticatedAdmin'] },
+    },
+    {
+      method: 'POST',
+      path: '/items/bulk-purge',
+      handler: 'recycleBin.bulkPurge',
+      config: { policies: ['admin::isAuthenticatedAdmin'] },
+    },
+    {
+      method: 'POST',
       path: '/items/:id/restore',
       handler: 'recycleBin.restore',
       config: { policies: ['admin::isAuthenticatedAdmin'] },

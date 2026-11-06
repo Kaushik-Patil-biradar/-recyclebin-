@@ -17,6 +17,8 @@ describe('Recycle Bin Controller', () => {
     mockRestoreService = {
       restoreItem: jest.fn().mockResolvedValue({ success: true }),
       purgeItem: jest.fn().mockResolvedValue({ id: 1 }),
+      restoreMany: jest.fn().mockResolvedValue({ success: true, count: 2, restored: [1, 2], errors: [] }),
+      purgeMany: jest.fn().mockResolvedValue({ success: true, count: 2 }),
     };
 
     mockStrapi = {
@@ -164,6 +166,69 @@ describe('Recycle Bin Controller', () => {
 
       expect(ctx.badRequest).toHaveBeenCalledWith('Invalid or missing item ID');
       expect(mockRestoreService.purgeItem).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('bulkRestore', () => {
+    it('should restore multiple items successfully with valid IDs', async () => {
+      const ctx: any = {
+        request: { body: { ids: [1, 2] } },
+        body: null,
+      };
+
+      await controller.bulkRestore(ctx);
+
+      expect(mockRestoreService.restoreMany).toHaveBeenCalledWith([1, 2]);
+      expect(ctx.body).toEqual({
+        data: { success: true, count: 2, restored: [1, 2], errors: [] },
+      });
+    });
+
+    it('should reject invalid or non-array IDs', async () => {
+      const ctx: any = {
+        request: { body: { ids: 'invalid' } },
+        badRequest: jest.fn(),
+      };
+
+      await controller.bulkRestore(ctx);
+
+      expect(ctx.badRequest).toHaveBeenCalledWith('Invalid or missing item IDs array');
+    });
+
+    it('should reject array with no positive numeric IDs', async () => {
+      const ctx: any = {
+        request: { body: { ids: [-1, 0, 'abc'] } },
+        badRequest: jest.fn(),
+      };
+
+      await controller.bulkRestore(ctx);
+
+      expect(ctx.badRequest).toHaveBeenCalledWith('No valid item IDs provided');
+    });
+  });
+
+  describe('bulkPurge', () => {
+    it('should purge multiple items successfully with valid IDs', async () => {
+      const ctx: any = {
+        request: { body: { ids: [1, 2, 3] } },
+        body: null,
+      };
+
+      await controller.bulkPurge(ctx);
+
+      expect(mockRestoreService.purgeMany).toHaveBeenCalledWith([1, 2, 3]);
+      expect(ctx.body).toEqual({ data: { success: true, count: 2 } });
+    });
+
+    it('should reject invalid or empty IDs array', async () => {
+      const ctx: any = {
+        request: { body: { ids: [] } },
+        badRequest: jest.fn(),
+      };
+
+      await controller.bulkPurge(ctx);
+
+      expect(ctx.badRequest).toHaveBeenCalledWith('Invalid or missing item IDs array');
     });
   });
 });

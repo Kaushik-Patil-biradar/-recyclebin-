@@ -75,4 +75,50 @@ export default ({ strapi }: { strapi: Core.Strapi }) => ({
       return ctx.badRequest(err.message || 'Failed to purge item');
     }
   },
+
+  async bulkRestore(ctx: any) {
+    const { ids } = ctx.request.body || {};
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return ctx.badRequest('Invalid or missing item IDs array');
+    }
+
+    const validIds = ids
+      .map((id: any) => parseInt(id, 10))
+      .filter((id: number) => !isNaN(id) && id > 0);
+
+    if (validIds.length === 0) {
+      return ctx.badRequest('No valid item IDs provided');
+    }
+
+    try {
+      const result = await strapi.plugin('recycle-bin').service('restore').restoreMany(validIds);
+      ctx.body = { data: result };
+    } catch (err: any) {
+      return ctx.badRequest(err.message || 'Failed to bulk restore items');
+    }
+  },
+
+  async bulkPurge(ctx: any) {
+    const { ids } = ctx.request.body || {};
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return ctx.badRequest('Invalid or missing item IDs array');
+    }
+
+    const validIds = ids
+      .map((id: any) => parseInt(id, 10))
+      .filter((id: number) => !isNaN(id) && id > 0);
+
+    if (validIds.length === 0) {
+      return ctx.badRequest('No valid item IDs provided');
+    }
+
+    try {
+      const result = await strapi.plugin('recycle-bin').service('restore').purgeMany(validIds);
+      ctx.body = { data: result };
+    } catch (err: any) {
+      return ctx.badRequest(err.message || 'Failed to bulk purge items');
+    }
+  },
 });

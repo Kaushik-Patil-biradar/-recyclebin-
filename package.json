@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-recycle-bin",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Safely intercept content deletions in Strapi 5 with a soft-delete recycle bin",
   "repository": {
     "type": "git",
@@ -90,5 +90,8 @@
     "name": "recycle-bin",
     "displayName": "Recycle Bin",
     "description": "Safely intercept content deletions in Strapi 5 with a soft-delete recycle bin"
+  },
+  "dependencies": {
+    "react-toastify": "^11.2.0"
   }
 }

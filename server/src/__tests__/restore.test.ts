@@ -9,6 +9,7 @@ describe('Restore Service', () => {
     mockDbQuery = {
       findOne: jest.fn(),
       delete: jest.fn().mockResolvedValue({ id: 1 }),
+      deleteMany: jest.fn().mockResolvedValue({ count: 2 }),
     };
 
     mockStrapi = {
@@ -48,6 +49,7 @@ describe('Restore Service', () => {
       mockDbQuery.findOne.mockResolvedValue({
         id: 5,
         entityUid: 'api::article.article',
+        recordDocumentId: 'doc123',
         payload: [
           {
             id: 10,
@@ -65,7 +67,7 @@ describe('Restore Service', () => {
         options: { draftAndPublish: true },
       });
 
-      const mockCreate = jest.fn().mockResolvedValue({ documentId: 'new-doc-id' });
+      const mockCreate = jest.fn().mockResolvedValue({ documentId: 'doc123' });
       mockStrapi.documents.mockReturnValue({ create: mockCreate });
 
       const result = await restoreService.restoreItem(5);
@@ -73,6 +75,7 @@ describe('Restore Service', () => {
       expect(result).toEqual({ success: true });
       expect(mockStrapi.documents).toHaveBeenCalledWith('api::article.article');
       expect(mockCreate).toHaveBeenCalledWith({
+        documentId: 'doc123',
         data: {
           title: 'My Article',
           content: 'Hello World',
@@ -87,6 +90,7 @@ describe('Restore Service', () => {
       mockDbQuery.findOne.mockResolvedValue({
         id: 7,
         entityUid: 'api::setting.setting',
+        recordDocumentId: 'doc_setting',
         payload: {
           id: 20,
           documentId: 'doc_setting',
@@ -100,12 +104,13 @@ describe('Restore Service', () => {
         options: { draftAndPublish: false },
       });
 
-      const mockCreate = jest.fn().mockResolvedValue({ documentId: 'new-setting-id' });
+      const mockCreate = jest.fn().mockResolvedValue({ documentId: 'doc_setting' });
       mockStrapi.documents.mockReturnValue({ create: mockCreate });
 
       await restoreService.restoreItem(7);
 
       expect(mockCreate).toHaveBeenCalledWith({
+        documentId: 'doc_setting',
         data: {
           key: 'site_name',
           value: 'My Site',
@@ -121,6 +126,60 @@ describe('Restore Service', () => {
 
       expect(mockStrapi.db.query).toHaveBeenCalledWith('plugin::recycle-bin.recycle-bin-item');
       expect(mockDbQuery.delete).toHaveBeenCalledWith({ where: { id: 15 } });
+    });
+  });
+
+  describe('restoreMany', () => {
+    it('should restore multiple items successfully', async () => {
+      mockDbQuery.findOne.mockResolvedValue({
+        id: 1,
+        entityUid: 'api::article.article',
+        recordDocumentId: 'doc1',
+        payload: [{ title: 'Item' }],
+      });
+      mockStrapi.contentType.mockReturnValue({ options: {} });
+      mockStrapi.documents.mockReturnValue({ create: jest.fn().mockResolvedValue({}) });
+
+      const result = await restoreService.restoreMany([1, 2]);
+
+      expect(result.success).toBe(true);
+      expect(result.count).toBe(2);
+      expect(result.restored).toEqual([1, 2]);
+    });
+
+    it('should track errors if an item fails to restore', async () => {
+      mockDbQuery.findOne
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce({
+          id: 2,
+          entityUid: 'api::article.article',
+          recordDocumentId: 'doc2',
+          payload: [{ title: 'Item 2' }],
+        });
+      mockStrapi.contentType.mockReturnValue({ options: {} });
+      mockStrapi.documents.mockReturnValue({ create: jest.fn().mockResolvedValue({}) });
+
+      const result = await restoreService.restoreMany([1, 2]);
+
+      expect(result.success).toBe(false);
+      expect(result.count).toBe(1);
+      expect(result.errors.length).toBe(1);
+      expect(result.errors[0].id).toBe(1);
+    });
+  });
+
+  describe('purgeMany', () => {
+    it('should delete multiple items by id', async () => {
+      const result = await restoreService.purgeMany([1, 2]);
+
+      expect(mockDbQuery.deleteMany).toHaveBeenCalledWith({ where: { id: { $in: [1, 2] } } });
+      expect(result).toEqual({ success: true, count: 2 });
+    });
+
+    it('should return 0 count if empty ids array is passed', async () => {
+      const result = await restoreService.purgeMany([]);
+
+      expect(result).toEqual({ success: true, count: 0 });
     });
   });
 });

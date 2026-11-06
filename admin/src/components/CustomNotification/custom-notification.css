@@ -1,0 +1,72 @@
+/* Custom react-toastify styling for Strapi Recycle Bin Plugin */
+@import 'react-toastify/dist/ReactToastify.css';
+
+.recycle-bin-toast-container {
+  z-index: 999999 !important;
+  width: auto !important;
+  max-width: 460px !important;
+}
+
+.recycle-bin-toast {
+  width: 420px !important;
+  max-width: 90vw !important;
+  border-radius: 8px !important;
+  padding: 14px 16px !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.18), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+  min-height: 64px !important;
+  border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+  background-color: #ffffff !important;
+  color: #212134 !important;
+  margin: 0 auto 12px auto !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  .recycle-bin-toast {
+    background-color: #212134 !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+  }
+}
+
+/* Accent borders */
+.recycle-bin-toast-deleted {
+  border-left: 5px solid #d02b20 !important;
+}
+
+.recycle-bin-toast-error {
+  border-left: 5px solid #ee5e52 !important;
+}
+
+.recycle-bin-toast-restore {
+  border-left: 5px solid #2f7c31 !important;
+}
+
+.recycle-bin-toast-info {
+  border-left: 5px solid #4945ff !important;
+}
+
+.recycle-bin-toast-warning {
+  border-left: 5px solid #f29d41 !important;
+}
+
+/* Progress bar colors */
+.recycle-bin-progress-deleted {
+  background: #d02b20 !important;
+}
+
+.recycle-bin-progress-error {
+  background: #ee5e52 !important;
+}
+
+.recycle-bin-progress-restore {
+  background: #2f7c31 !important;
+}
+
+.recycle-bin-progress-info {
+  background: #4945ff !important;
+}
+
+.recycle-bin-progress-warning {
+  background: #f29d41 !important;
+}
